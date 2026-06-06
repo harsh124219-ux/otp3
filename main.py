@@ -59,7 +59,8 @@ session_mod = _import_or_die("handlers.session", "handlers.session")
 fsub_mod    = _import_or_die("handlers.fsub",    "handlers.fsub")
 
 # Unpack everything we need
-from info import BOT_TOKEN, API_ID, API_HASH, ADMIN_ID, PORT
+# ✅ After  
+from info import BOT_TOKEN, API_ID, API_HASH, ADMIN_ID, LOG_GROUP, PORT
 
 from database import init_db, is_admin
 
