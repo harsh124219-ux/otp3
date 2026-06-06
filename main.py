@@ -132,21 +132,24 @@ async def raw_update_handler(client, update, users, chats):
 #  DEBUG: Global message logger (group=-1)
 # ─────────────────────────────────────────────
 
-@app.on_message(filters.private, group=-1)
+@app.on_message()
 async def global_debug_logger(client, message: Message):
+    # Log ALL incoming messages regardless of chat type
     uid  = message.from_user.id if message.from_user else "?"
     text = (message.text or "[non-text]")[:60]
-    logger.info(f"📨 MSG from {uid}: {text}")
+    chat_type = message.chat.type if message.chat else "unknown"
+    logger.info(f"📨 MSG from {uid} [{chat_type}]: {text}")
 
 
 # ─────────────────────────────────────────────
 #  USER COMMANDS
 # ─────────────────────────────────────────────
 
-@app.on_message(
-    filters.command(_USER_CMDS) & filters.private
-)
+@app.on_message(filters.command(_USER_CMDS))
 async def user_commands_handler(client, message: Message):
+    # Only handle private chats
+    if not message.chat or message.chat.type.value != "private":
+        return
     cmd = message.command[0].lower()
     if cmd == "start":
         await start(client, message)
@@ -166,10 +169,10 @@ async def user_commands_handler(client, message: Message):
 #  ADMIN COMMANDS
 # ─────────────────────────────────────────────
 
-@app.on_message(
-    filters.command(_ADMIN_CMDS) & filters.private
-)
+@app.on_message(filters.command(_ADMIN_CMDS))
 async def admin_commands_handler(client, message: Message):
+    if not message.chat or message.chat.type.value != "private":
+        return
     if not is_admin(message.from_user.id):
         await message.reply("❌ **Access Denied.** This command is for admins only.")
         return
@@ -202,10 +205,10 @@ async def admin_commands_handler(client, message: Message):
 #           → admin_states → user_states → ignore
 # ─────────────────────────────────────────────
 
-@app.on_message(
-    filters.private & ~filters.command(_ALL_CMDS)
-)
+@app.on_message(~filters.command(_ALL_CMDS))
 async def generic_message_handler(client, message: Message):
+    if not message.chat or message.chat.type.value != "private":
+        return
     if not message.from_user:
         return
 
