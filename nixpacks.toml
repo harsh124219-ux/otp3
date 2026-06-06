@@ -1,0 +1,9 @@
+# nixpacks.toml — Python version for Railway's Nixpacks builder
+[phases.setup]
+nixPkgs = ["python311", "gcc"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "python main.py"

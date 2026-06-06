@@ -1,0 +1,46 @@
+# ─────────────────────────────────────────────
+#  OTP Ocean — .gitignore
+#  NEVER commit .env or session files to GitHub
+# ─────────────────────────────────────────────
+
+# Environment variables — NEVER commit this
+.env
+
+# Pyrogram session files (contain auth tokens)
+*.session
+*.session-journal
+otp_ocean_main.session
+temp_session.session
+otp_*.session
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
