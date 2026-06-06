@@ -455,19 +455,34 @@ async def main():
         traceback.print_exc()
         sys.exit(1)
 
-    # 3. Clear any existing webhook / pending updates that block getUpdates
+    # 3. Drop all pending updates so Pyrogram starts with a clean slate
     import aiohttp as _aiohttp
     try:
         _bot_token = BOT_TOKEN.strip()
         async with _aiohttp.ClientSession() as _s:
-            # Delete webhook and drop pending updates so long-polling works cleanly
+            # Step 1: delete any webhook
             await _s.get(
                 f"https://api.telegram.org/bot{_bot_token}/deleteWebhook?drop_pending_updates=true",
                 timeout=_aiohttp.ClientTimeout(total=10)
             )
-            logger.info("✅ Webhook cleared — long polling is clean")
+            # Step 2: get current update_id and advance offset past all pending updates
+            resp = await _s.get(
+                f"https://api.telegram.org/bot{_bot_token}/getUpdates?limit=100&timeout=0",
+                timeout=_aiohttp.ClientTimeout(total=10)
+            )
+            data = await resp.json()
+            if data.get("ok") and data.get("result"):
+                last_update_id = data["result"][-1]["update_id"]
+                # Advance offset by 1 past last update — clears the queue
+                await _s.get(
+                    f"https://api.telegram.org/bot{_bot_token}/getUpdates?offset={last_update_id + 1}&limit=1&timeout=0",
+                    timeout=_aiohttp.ClientTimeout(total=10)
+                )
+                logger.info(f"✅ Cleared {len(data['result'])} pending update(s) — Pyrogram starts fresh")
+            else:
+                logger.info("✅ No pending updates — Pyrogram starts clean")
     except Exception as _e:
-        logger.warning(f"⚠️ Could not clear webhook (non-fatal): {_e}")
+        logger.warning(f"⚠️ Could not clear pending updates (non-fatal): {_e}")
 
     # 4. Start bot and web server
     web_runner = None
