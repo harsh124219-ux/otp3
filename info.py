@@ -12,14 +12,14 @@ load_dotenv()
 #  CORE ENVIRONMENT VARIABLES
 # ─────────────────────────────────────────────
 
-BOT_TOKEN   = os.environ.get("BOT_TOKEN", "")
-API_ID      = int(os.environ.get("API_ID", 0))
-API_HASH    = os.environ.get("API_HASH", "")
-ADMIN_ID    = int(os.environ.get("ADMIN_ID", 0))
-LOG_GROUP   = int(os.environ.get("LOG_GROUP", 0))
-MONGO_URL   = os.environ.get("MONGO_URL", "")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8916306945:AAHjtF3dlQl954mmM92kXRn7Xm5m7nE3Fh8")  # ✅ string - OK
+API_ID    = int(os.environ.get("API_ID", "20090271"))   # ✅ string of digits inside int()
+API_HASH  = os.environ.get("API_HASH", "70bcf19f9ac3a895954dced6a963ac4f")  # ✅ string - OK
+ADMIN_ID  = int(os.environ.get("ADMIN_ID", "8429057291")) # ✅ string of digits inside int()
+LOG_GROUP = int(os.environ.get("LOG_GROUP", "-1005195170836")) # ✅ negative number as string
+MONGO_URL = os.environ.get("MONGO_URL", "") # ✅ string - OK
 PORT        = int(os.environ.get("PORT", 8080))
-HEROKU_APP  = os.environ.get("HEROKU_APP_NAME", "")
+HEROKU_APP  = os.environ.get("HEROKU_APP_NAME", "otpbot")
 
 # ─────────────────────────────────────────────
 #  USER-FACING TEXT STRINGS
