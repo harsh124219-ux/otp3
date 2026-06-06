@@ -59,7 +59,6 @@ session_mod = _import_or_die("handlers.session", "handlers.session")
 fsub_mod    = _import_or_die("handlers.fsub",    "handlers.fsub")
 
 # Unpack everything we need
-# ✅ After  
 from info import BOT_TOKEN, API_ID, API_HASH, ADMIN_ID, LOG_GROUP, PORT
 
 from database import init_db, is_admin
@@ -453,7 +452,21 @@ async def main():
         traceback.print_exc()
         sys.exit(1)
 
-    # 3. Start bot and web server
+    # 3. Clear any existing webhook / pending updates that block getUpdates
+    import aiohttp as _aiohttp
+    try:
+        _bot_token = BOT_TOKEN.strip()
+        async with _aiohttp.ClientSession() as _s:
+            # Delete webhook and drop pending updates so long-polling works cleanly
+            await _s.get(
+                f"https://api.telegram.org/bot{_bot_token}/deleteWebhook?drop_pending_updates=true",
+                timeout=_aiohttp.ClientTimeout(total=10)
+            )
+            logger.info("✅ Webhook cleared — long polling is clean")
+    except Exception as _e:
+        logger.warning(f"⚠️ Could not clear webhook (non-fatal): {_e}")
+
+    # 4. Start bot and web server
     web_runner = None
     async with app:
         me = await app.get_me()
