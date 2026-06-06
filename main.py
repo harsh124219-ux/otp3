@@ -88,7 +88,7 @@ from handlers.session import (
     session_states,
 )
 from handlers.fsub import check_fsub, recheck_fsub_callback
-from keep_alive import start_keep_alive
+from keep_alive import start_keep_alive, self_ping_loop
 
 
 # ─────────────────────────────────────────────
@@ -507,17 +507,18 @@ async def main():
             )
         except Exception as e:
             logger.warning(f"⚠️ Could not send startup message to admin: {e}")
-
-        # 6. Check for incomplete login sessions (restart recovery)
-        asyncio.create_task(check_incomplete_sessions(app))
+# 6. Check for incomplete login sessions (restart recovery)
+        loop = asyncio.get_running_loop()
+        loop.create_task(check_incomplete_sessions(app))
 
         # 7. Start keep-alive self-ping (prevents Render/Railway sleep)
-        start_keep_alive()
+        loop.create_task(self_ping_loop())
 
         logger.info("🟢 Bot is ready and polling!")
 
-        # 7. Run until stopped
+        # 8. Run until stopped
         await idle()
+   
 
     # 8. Cleanup
     if web_runner:
