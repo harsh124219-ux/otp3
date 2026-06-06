@@ -87,6 +87,5 @@ def start_keep_alive() -> asyncio.Task:
         from keep_alive import start_keep_alive
         keep_alive_task = start_keep_alive()
     """
-    loop = asyncio.get_event_loop()
-    task = loop.create_task(self_ping_loop())
+    task = asyncio.get_running_loop().create_task(self_ping_loop())
     return task
